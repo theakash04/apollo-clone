@@ -34,7 +34,7 @@ export default function SortDropdown() {
       </div>
 
       {/* Sort Button */}
-      <div className="flex items-center md:justify-end justify-between ">
+      <div className="flex items-center md:justify-end justify-between w-full">
         <Button
           className="cursor-pointer block md:hidden"
           variant={"ghost"}
