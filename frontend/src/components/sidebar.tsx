@@ -195,15 +195,6 @@ export default function Sidebar({ className }: SidebarProps) {
             ))}
           </div>
         </div>
-
-        <div className="sticky bottom-0 bg-white border-t border-gray-100 px-6 pt-4 pb-6">
-          <a
-            href="/specialties/general-physician-internal-medicine?page=5&sortby=distance"
-            className="w-full flex items-center justify-center px-4 py-2 border border-blue-600 text-sm font-medium rounded-md text-blue-600 hover:bg-blue-50 transition-colors"
-          >
-            Show Doctors Near Me
-          </a>
-        </div>
       </div>
     </div>
   );
