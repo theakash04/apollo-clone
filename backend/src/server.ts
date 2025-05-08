@@ -81,12 +81,12 @@ app.get("/doctors-with-filters", async (req: Request, res: Response) => {
   if (req.query.fees) {
     const fees = (req.query.fees as string).split("-").map(Number);
     if (fees.length === 2) {
-      filters.$or = [
+      filters.$and = [
         { consult_fees: { $gte: fees[0], $lte: fees[1] } },
         { Physical_fees: { $gte: fees[0], $lte: fees[1] } },
       ];
     } else if (!isNaN(fees[0])) {
-      filters.$or = [
+      filters.$and = [
         { consult_fees: { $gte: fees[0] } },
         { Physical_fees: { $gte: fees[0] } },
       ];
@@ -135,10 +135,23 @@ app.get("/doctors-with-filters", async (req: Request, res: Response) => {
       {
         $addFields: {
           price: {
-            $min: [
-              { $ifNull: ["$consult_fees", Number.MAX_SAFE_INTEGER] },
-              { $ifNull: ["$Physical_fees", Number.MAX_SAFE_INTEGER] }
-            ]
+            $switch: {
+              branches: [
+                {
+                  case: { $and: [{ $ifNull: ["$consult_fees", false] }, { $ifNull: ["$Physical_fees", false] }] },
+                  then: { $min: ["$consult_fees", "$Physical_fees"] }
+                },
+                {
+                  case: { $ifNull: ["$consult_fees", false] },
+                  then: "$consult_fees"
+                },
+                {
+                  case: { $ifNull: ["$Physical_fees", false] },
+                  then: "$Physical_fees"
+                }
+              ],
+              default: Number.MAX_SAFE_INTEGER
+            }
           }
         }
       },
