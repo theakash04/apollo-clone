@@ -37,18 +37,22 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSidebarOpen, setSideBarOpen] = useState<boolean>(false);
   const [doctors, setDoctors] = useState<NewDoctor[]>([]);
-  const [totalDoctors, setTotalDoctors] = useState<number>(0)
+  const [totalDoctors, setTotalDoctors] = useState<number>(0);
 
   const addDoctor = async (doc: NewDoctor) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(doc),
-      }); const newDoctor = await response.json();
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/add`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(doc),
+        }
+      );
+      const newDoctor = await response.json();
       if (!response.ok) {
         throw new Error("Failed to add doctor");
       }
@@ -70,8 +74,8 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
 
     // Pagination
     if (filters.page) params.append("page", filters.page.toString());
-    if (filters.limit) params.append("limit", filters.limit.toString())
-    else params.append("limit", "5")
+    if (filters.limit) params.append("limit", filters.limit.toString());
+    else params.append("limit", "5");
 
     // Sorting
     if (filters.sortBy) params.append("sortBy", filters.sortBy);
@@ -105,7 +109,9 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
       params.append("available", filters.available.toString());
     }
 
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/doctors-with-filters?${params.toString()}`;
+    const url = `${
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    }/doctors-with-filters?${params.toString()}`;
 
     const res = await fetch(url);
     if (!res.ok) {
@@ -113,7 +119,7 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
     }
 
     const data = await res.json();
-    console.log(data)
+    console.log(data);
     return data;
   }
 
@@ -172,10 +178,9 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
     fetchDoctorsWithFilters(queryParams).then((result) => {
       updated = [...result.data];
       setFilteredDoctors(updated);
-      setTotalDoctors(result.total)
+      setTotalDoctors(result.total);
+      setIsLoading(false);
     });
-
-    setIsLoading(false);
   }, [doctors, filters, sortOption]);
 
   return (
@@ -192,7 +197,7 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
         isSidebarOpen,
         isLoading,
         setIsLoading,
-        totalDoctors
+        totalDoctors,
       }}
     >
       {children}
