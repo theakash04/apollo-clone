@@ -9,7 +9,7 @@ export type Doctor = {
   image: string;
   Physical_fees?: number;
   about: string[];
-  language: string[];
+  languages: string[];
   mode: string[];
   isAvailable?: boolean;
   faculty: string;

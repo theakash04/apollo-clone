@@ -25,6 +25,7 @@ type DoctorContextType = {
   setSideBarOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isSidebarOpen: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  totalDoctors: number;
 };
 
 const DoctorContext = createContext<DoctorContextType | null>(null);
@@ -36,6 +37,7 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSidebarOpen, setSideBarOpen] = useState<boolean>(false);
   const [doctors, setDoctors] = useState<NewDoctor[]>([]);
+  const [totalDoctors, setTotalDoctors] = useState<number>(0)
 
   const addDoctor = async (doc: NewDoctor) => {
     setIsLoading(true);
@@ -68,7 +70,8 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
 
     // Pagination
     if (filters.page) params.append("page", filters.page.toString());
-    if (filters.limit) params.append("limit", filters.limit.toString());
+    if (filters.limit) params.append("limit", filters.limit.toString())
+    else params.append("limit", "5")
 
     // Sorting
     if (filters.sortBy) params.append("sortBy", filters.sortBy);
@@ -110,6 +113,7 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
     }
 
     const data = await res.json();
+    console.log(data)
     return data;
   }
 
@@ -141,6 +145,9 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
         queryParams.fees = [min, 99999]; // Or any high upper bound
       }
     }
+    if (filters.page?.[0]) {
+      queryParams.page = parseInt(filters.page[0], 10);
+    }
     if (filters.languages) queryParams.languages = filters.languages;
     if (filters.faculty?.[0]) queryParams.faculty = filters.faculty[0];
 
@@ -165,6 +172,7 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
     fetchDoctorsWithFilters(queryParams).then((result) => {
       updated = [...result.data];
       setFilteredDoctors(updated);
+      setTotalDoctors(result.total)
     });
 
     setIsLoading(false);
@@ -184,6 +192,7 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
         isSidebarOpen,
         isLoading,
         setIsLoading,
+        totalDoctors
       }}
     >
       {children}

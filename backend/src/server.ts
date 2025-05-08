@@ -50,17 +50,9 @@ app.get("/health", (_req: Request, res: Response) => {
 
 // get all doctor + add filters
 app.get("/doctors-with-filters", async (req: Request, res: Response) => {
-  // pgaination
-  const page = parseInt(req.query.page as string) || 1;
-  const limit = parseInt(req.query.limit as string) || 10;
+  const page = parseInt(req.query.page as string);
+  const limit = parseInt(req.query.limit as string);
   const skip = (page - 1) * limit;
-
-  // sort
-  const allowedSortFields = ["name", "experience", "price"];
-  const sortBy = allowedSortFields.includes(req.query.sortBy as string)
-    ? (req.query.sortBy as string)
-    : "name";
-  const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
 
   const filters: any = {};
 
@@ -71,7 +63,8 @@ app.get("/doctors-with-filters", async (req: Request, res: Response) => {
       : [req.query.mode];
     filters.mode = { $in: mode };
   }
-  // Experience filter (e.g. "0-5", "6-10")
+
+  // Experience filter
   if (req.query.experience) {
     const experience = (req.query.experience as string).split("-").map(Number);
     if (experience.length === 2) {
@@ -84,25 +77,23 @@ app.get("/doctors-with-filters", async (req: Request, res: Response) => {
     }
   }
 
-  // Fees filter (consult or physical)
+  // Fees filter
   if (req.query.fees) {
-    const feesString = req.query.fees as string;
-
-    const fees = feesString.split("-").map(Number);
+    const fees = (req.query.fees as string).split("-").map(Number);
     if (fees.length === 2) {
       filters.$or = [
         { consult_fees: { $gte: fees[0], $lte: fees[1] } },
-        { physical_fees: { $gte: fees[0], $lte: fees[1] } },
+        { Physical_fees: { $gte: fees[0], $lte: fees[1] } },
       ];
     } else if (!isNaN(fees[0])) {
       filters.$or = [
         { consult_fees: { $gte: fees[0] } },
-        { physical_fees: { $gte: fees[0] } },
+        { Physical_fees: { $gte: fees[0] } },
       ];
     }
   }
 
-  // Language filter (e.g. ["Hindi", "English"])
+  // Language filter
   if (req.query.languages) {
     const langs = Array.isArray(req.query.languages)
       ? req.query.languages
@@ -112,7 +103,8 @@ app.get("/doctors-with-filters", async (req: Request, res: Response) => {
     };
   }
 
-  // faculty
+
+  // Faculty filter
   if (req.query.faculty) {
     const faculty = req.query.faculty as string;
     if (faculty.toLowerCase() === "other clinics") {
@@ -129,15 +121,39 @@ app.get("/doctors-with-filters", async (req: Request, res: Response) => {
     filters.isAvailable = req.query.available === "true";
   }
 
+  // Sorting
+  const sortBy = req.query.sortBy === "experience" ? "experience"
+    : req.query.sortBy === "name" ? "name"
+      : req.query.sortBy === "price" ? "price"
+        : "name";
+
+  const sortOrder = req.query.sortOrder === "desc" ? -1 : 1;
+
   try {
-    const doctors = await Doctor.find(filters)
-      .sort({ [sortBy]: sortOrder })
-      .skip(skip)
-      .limit(limit);
+    const doctors = await Doctor.aggregate([
+      { $match: filters },
+      {
+        $addFields: {
+          price: {
+            $min: [
+              { $ifNull: ["$consult_fees", Number.MAX_SAFE_INTEGER] },
+              { $ifNull: ["$Physical_fees", Number.MAX_SAFE_INTEGER] }
+            ]
+          }
+        }
+      },
+      { $sort: { [sortBy]: sortOrder } },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const total = await Doctor.countDocuments(filters);
 
     res.json({
       data: doctors,
-      total: doctors.length,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
     });
   } catch (err) {
     res.status(500).json({ error: "Server error", details: err });
@@ -147,7 +163,6 @@ app.get("/doctors-with-filters", async (req: Request, res: Response) => {
 // add a doctor
 app.post("/add", async (req: Request, res: Response) => {
   const doc: newDoctor = req.body;
-
   try {
     const newDoctor = new Doctor(doc);
     await newDoctor.save();

@@ -14,15 +14,20 @@ import { Pen } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function DoctorsPage() {
-  const { filteredDoctors, isLoading } = useDoctorContext();
-  const [page, setPage] = useState<number>(1);
+  const { filteredDoctors, isLoading, setFilters, totalDoctors } = useDoctorContext();
+  const [currPage, setCurrPage] = useState<number>(1);
   const [addIsOpen, setAddOpen] = useState<boolean>(false);
 
   const pageSize = 5;
 
+
   useEffect(() => {
+    setFilters((prev) => ({
+      ...prev, page: [currPage.toString()], limit: [pageSize.toString()],
+
+    }))
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page]);
+  }, [currPage]);
 
   return (
     <div className="flex flex-col min-h-screen relative ">
@@ -38,12 +43,11 @@ export default function DoctorsPage() {
       </div>
 
       <div
-        className={`absolute inset-0 z-60 justify-center items-center backdrop-blur-2xl overflow-hidden ${
-          addIsOpen ? "flex" : "hidden"
-        }`}
+        className={`absolute bg-black/30 inset-0 z-60 justify-center items-center backdrop-blur-2xl overflow-hidden ${addIsOpen ? "flex" : "hidden"
+          }`}
       >
         <div className="max-w-6xl w-full h-screen">
-          <AddDoctor onClose={() => setAddOpen(false)} />
+          <AddDoctor onCloseAction={() => setAddOpen(false)} />
         </div>
       </div>
       <Header />
@@ -78,11 +82,11 @@ export default function DoctorsPage() {
               ))
             )}
           </div>
-          {filteredDoctors.length > 0 && (
+          {totalDoctors > 0 && (
             <Pagination
-              total={filteredDoctors.length}
-              page={page}
-              setPage={setPage}
+              total={totalDoctors}
+              page={currPage}
+              setPage={setCurrPage}
               pageSize={pageSize}
             />
           )}

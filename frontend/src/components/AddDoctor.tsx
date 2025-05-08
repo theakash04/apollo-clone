@@ -1,5 +1,4 @@
 "use client";
-
 import { useForm } from "react-hook-form";
 import { useDoctorContext } from "@/context/doctorContext";
 import { NewDoctor } from "@/types/doctorTypes";
@@ -22,10 +21,10 @@ type FormData = {
 };
 
 type AddDoctorProps = {
-  onClose: () => void;
+  onCloseAction: () => void;
 };
 
-export default function AddDoctor({ onClose }: AddDoctorProps) {
+export default function AddDoctor({ onCloseAction }: AddDoctorProps) {
   const { addDoctor } = useDoctorContext();
   const {
     register,
@@ -53,17 +52,16 @@ export default function AddDoctor({ onClose }: AddDoctorProps) {
       speciality: data.speciality.split(",").map((s) => s.trim()),
       about: data.about.split(",").map((a) => a.trim()),
       mode: data.mode,
-      language: data.language.split(",").map((l) => l.trim()),
+      languages: data.language.split(",").map((l) => l.trim()),
       faculty: data.faculty,
-      // assign fees only if selected
       ...(onlineSelected && { consult_fees: data.onlineFees! }),
       ...(physicalSelected && { Physical_fees: data.consultFees! }),
       isAvailable: data.isAvailable,
     };
 
-    await addDoctor(newDoc);
+    addDoctor(newDoc);
     reset();
-    onClose();
+    onCloseAction();
   };
 
   return (
@@ -275,7 +273,7 @@ export default function AddDoctor({ onClose }: AddDoctorProps) {
           variant="secondary"
           onClick={() => {
             reset();
-            onClose();
+            onCloseAction();
           }}
         >
           Cancel

@@ -8,7 +8,7 @@ export default function SortDropdown() {
     setSortOption,
     isSidebarOpen,
     setSideBarOpen,
-    filteredDoctors,
+    totalDoctors
   } = useDoctorContext();
 
   return (
@@ -28,7 +28,7 @@ export default function SortDropdown() {
             Consult General Physicians Online - Internal Medicine Specialists{" "}
           </h1>
           <span className="text-foreground/90 font-semibold text-sm">
-            ({filteredDoctors.length + " doctors"})
+            ({totalDoctors + " doctors"})
           </span>
         </div>
       </div>
