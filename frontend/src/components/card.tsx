@@ -51,11 +51,14 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
         <div className="flex items-center gap-4 relative">
           <div className="w-20 h-20 flex-shrink-0">
             <Image
-              src={doctor.image || "/doctor_default.png"}
+              src={doctor.image || "/doctor_default.webp"}
               alt={doctor.name}
               width={74}
               height={74}
               className="object-cover rounded-full w-full h-full"
+              onError={(e) => {
+                e.currentTarget.src = "/default-profile.webp";
+              }}
             />
           </div>
           <div className="flex flex-col flex-1 min-w-0">
@@ -113,9 +116,8 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
       {/* Sliding Panel */}
       <div
         ref={panelRef}
-        className={`fixed top-0 right-0 h-full w-[375px] max-w-full bg-white shadow-lg z-50 transition-transform duration-300 ease-in-out rounded-l-xl ${
-          showPanel ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-[375px] max-w-full bg-white shadow-lg z-50 transition-transform duration-300 ease-in-out rounded-l-xl ${showPanel ? "translate-x-0" : "translate-x-full"
+          }`}
         style={{ willChange: "transform" }}
       >
         <div className="">
