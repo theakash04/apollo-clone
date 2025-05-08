@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "Doctors | Apollo Clone",
   description: "Find and consult with top doctors online. Book appointments, get medical advice, and access healthcare from home.",
   keywords: "doctors, online consultation, healthcare, Apollo, medical specialists",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  ),
   openGraph: {
     title: "Doctors | Apollo Clone",
     description: "Find and consult with top doctors online. Book appointments and access healthcare from home.",
@@ -22,6 +25,7 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
+
 
 export default function DoctorLayout({
   children,
