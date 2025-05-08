@@ -40,14 +40,13 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
   const addDoctor = async (doc: NewDoctor) => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/add", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(doc),
-      });
-      const newDoctor = await response.json();
+      }); const newDoctor = await response.json();
       if (!response.ok) {
         throw new Error("Failed to add doctor");
       }
@@ -103,7 +102,7 @@ export function DoctorProvider({ children }: { children: ReactNode }) {
       params.append("available", filters.available.toString());
     }
 
-    const url = `http://localhost:8000/doctors-with-filters?${params.toString()}`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/doctors-with-filters?${params.toString()}`;
 
     const res = await fetch(url);
     if (!res.ok) {

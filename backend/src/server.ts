@@ -14,11 +14,11 @@ app.use(express.json());
 
 // cors things
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
-  "http://localhost:3000",
+  "http://localhost:3000", "https://apollo-clone-dusky.vercel.app"
 ];
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: function(origin, callback) {
       // Allow requests with no origin (e.g. mobile apps, curl)
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
