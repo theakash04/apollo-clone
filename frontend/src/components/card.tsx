@@ -55,10 +55,8 @@ export default function DoctorCard({ doctor }: DoctorCardProps) {
               alt={doctor.name}
               width={74}
               height={74}
+              unoptimized
               className="object-cover rounded-full w-full h-full"
-              onError={(e) => {
-                e.currentTarget.src = "/default-profile.webp";
-              }}
             />
           </div>
           <div className="flex flex-col flex-1 min-w-0">
